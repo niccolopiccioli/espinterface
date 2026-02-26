@@ -1,13 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
 import { useLanguage } from "@/lib/i18n";
 import { useTheme, Theme } from "@/lib/theme";
-import { Moon, Sun, Sparkles, Palette, Cpu, Globe } from "lucide-react";
-import { Topbar } from "@/components/hardware/topbar";
+import { Moon, Sun, Sparkles, Palette, Cpu, Globe, Home } from "lucide-react";
 
 export default function SettingsPage() {
   const { t, language, setLanguage } = useLanguage();
@@ -21,12 +21,9 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen">
-      <Topbar connected={true} deviceName="ESP32-WROOM-32" />
-
-      <div className="p-4 md:p-6 space-y-4 md:space-y-6">
-        {/* Hardware Configuration - FIRST */}
-        <Card className="bg-card border-border">
+    <div className="space-y-4 md:space-y-6">
+      {/* Hardware Configuration - FIRST */}
+      <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
               <Cpu className="h-5 w-5" style={{ color: 'var(--hw-success)' }} />
@@ -202,7 +199,6 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }

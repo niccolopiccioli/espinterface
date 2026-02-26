@@ -5,8 +5,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { GPIOState } from "@/lib/types";
 import { useLanguage } from "@/lib/i18n";
+import { Settings } from "lucide-react";
+import Link from "next/link";
 
 interface DigitalIOPanelProps {
   outputs: GPIOState[];
@@ -18,17 +21,25 @@ export function DigitalIOPanel({ outputs, inputs, onOutputToggle }: DigitalIOPan
   const { t } = useLanguage();
 
   return (
-    <Card className="bg-card border-border card-lift">
+    <Card className="bg-card border-border rounded-2xl shadow-lg">
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full animate-pulse-glow" style={{ backgroundColor: 'var(--hw-success)' }} />
-          {t("io.title")}
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base lg:text-lg font-semibold text-foreground flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full animate-pulse-glow" style={{ backgroundColor: 'var(--hw-success)' }} />
+            {t("io.title")}
+          </CardTitle>
+          <Link href="/devices">
+            <Button variant="outline" size="sm" className="text-[10px] lg:text-xs gap-1">
+              <Settings className="h-3 w-3 lg:h-4 lg:w-4" />
+              {t("devices.editDevices") || "Modifica dispositivi"}
+            </Button>
+          </Link>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Outputs Section */}
         <div className="space-y-3">
-          <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          <h4 className="text-[10px] lg:text-xs font-medium text-muted-foreground uppercase tracking-wider">
             {t("io.outputs")}
           </h4>
           <div className="grid grid-cols-2 gap-3">
@@ -40,7 +51,7 @@ export function DigitalIOPanel({ outputs, inputs, onOutputToggle }: DigitalIOPan
 
         {/* Inputs Section */}
         <div className="space-y-3">
-          <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          <h4 className="text-[10px] lg:text-xs font-medium text-muted-foreground uppercase tracking-wider">
             {t("io.inputs")}
           </h4>
           <div className="grid grid-cols-2 gap-3">
@@ -75,10 +86,10 @@ function OutputPin({ gpio, onToggle }: OutputPinProps) {
           aria-label={`GPIO ${gpio.pin} ${gpio.state ? "ON" : "OFF"}`}
         />
         <div>
-          <Label className="text-sm font-mono text-foreground">
+          <Label className="text-xs lg:text-sm font-mono text-foreground">
             {gpio.label}
           </Label>
-          <p className="text-xs text-muted-foreground font-mono">
+          <p className="text-[10px] lg:text-xs text-muted-foreground font-mono">
             GPIO {gpio.pin}
           </p>
         </div>
@@ -107,10 +118,10 @@ function InputPin({ gpio }: { gpio: GPIOState }) {
           aria-label={`Input GPIO ${gpio.pin} ${gpio.state ? "HIGH" : "LOW"}`}
         />
         <div>
-          <Label className="text-sm font-mono text-foreground">
+          <Label className="text-xs lg:text-sm font-mono text-foreground">
             {gpio.label}
           </Label>
-          <p className="text-xs text-muted-foreground font-mono">
+          <p className="text-[10px] lg:text-xs text-muted-foreground font-mono">
             GPIO {gpio.pin}
           </p>
         </div>

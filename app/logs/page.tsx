@@ -1,27 +1,76 @@
 "use client";
 
-import { Topbar } from "@/components/hardware/topbar";
+import { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/lib/i18n";
-import { FileText, AlertCircle, AlertTriangle, CheckCircle, Info } from "lucide-react";
+import { FileText, AlertCircle, AlertTriangle, CheckCircle, Info, Loader2, Home } from "lucide-react";
+
+// Backend URL - configure here
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+
+// Log level types
+type LogLevel = "info" | "success" | "warning" | "error";
+type LogSource = "system" | "uart" | "gpio" | "i2c" | "spi";
+
+interface LogEntry {
+  id: string;
+  timestamp: string;
+  level: LogLevel;
+  source: LogSource;
+  message: string;
+}
+
+interface LogsResponse {
+  status: string;
+  timestamp: string;
+  data: {
+    logs: LogEntry[];
+    total: number;
+  };
+}
 
 export default function LogsPage() {
   const { t } = useLanguage();
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [connected, setConnected] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  const logs = [
-    { id: 1, timestamp: "10:23:45", level: "info", message: "System boot completed" },
-    { id: 2, timestamp: "10:23:46", level: "info", message: "WiFi initialized" },
-    { id: 3, timestamp: "10:23:47", level: "info", message: "I2C bus scanning..." },
-    { id: 4, timestamp: "10:23:48", level: "success", message: "Found 3 I2C devices" },
-    { id: 5, timestamp: "10:23:49", level: "info", message: "SPI initialized" },
-    { id: 6, timestamp: "10:24:00", level: "info", message: "Web server started on port 80" },
-    { id: 7, timestamp: "10:25:12", level: "warning", message: "High temperature: 45°C" },
-    { id: 8, timestamp: "10:26:30", level: "info", message: "GPIO state changed: GPIO04 -> HIGH" },
-    { id: 9, timestamp: "10:27:15", level: "error", message: "I2C device 0x76 not responding" },
-    { id: 10, timestamp: "10:28:00", level: "info", message: "Watchdog reset prevented" },
-  ];
+  const fetchLogs = useCallback(async () => {
+    try {
+      const response = await fetch(`${API_BASE}/api/logs`);
+      if (response.ok) {
+        const data: LogsResponse = await response.json();
+        setLogs(data.data.logs);
+        setConnected(true);
+      } else {
+        setConnected(false);
+        setLogs([]);
+      }
+    } catch {
+      setConnected(false);
+      setLogs([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLogs();
+    const interval = setInterval(fetchLogs, 2000);
+    return () => clearInterval(interval);
+  }, [fetchLogs]);
+
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return date.toLocaleTimeString("it-IT", { 
+      hour: "2-digit", 
+      minute: "2-digit", 
+      second: "2-digit" 
+    });
+  };
 
   const getLevelIcon = (level: string) => {
     switch (level) {
@@ -59,17 +108,36 @@ export default function LogsPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Topbar connected={true} deviceName="ESP32-WROOM-32" />
+  const getSourceBadge = (source: LogSource) => {
+    const colors: Record<LogSource, string> = {
+      system: "var(--hw-active)",
+      uart: "#8B5CF6",
+      gpio: "#F59E0B",
+      i2c: "#10B981",
+      spi: "#3B82F6",
+    };
+    return (
+      <Badge variant="outline" className="text-[10px] md:text-xs shrink-0 border">
+        <span className="mr-1" style={{ color: colors[source] }}>●</span>
+        {source.toUpperCase()}
+      </Badge>
+    );
+  };
 
-      <div className="flex-1 p-3 md:p-4 lg:p-6">
-        <Card className="bg-card border-border h-full flex flex-col">
-          <CardHeader className="pb-3 md:pb-4 shrink-0">
-            <CardTitle className="text-lg md:text-xl font-semibold text-foreground flex items-center gap-2">
-              <FileText className="h-5 w-5" style={{ color: 'var(--hw-success)' }} />
-              {t("logs.title")}
-            </CardTitle>
+  return (
+    <div className="flex flex-col">
+      <Card className="bg-card border-border h-full flex flex-col">
+        <CardHeader className="pb-3 md:pb-4 shrink-0 flex flex-row items-center justify-between">
+          <CardTitle className="text-lg md:text-xl font-semibold text-foreground flex items-center gap-2">
+            <FileText className="h-5 w-5" style={{ color: 'var(--hw-success)' }} />
+            {t("logs.title")}
+          </CardTitle>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">
+                {logs.length} {t("logs.entries") || "entries"}
+              </span>
+              {loading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
+            </div>
           </CardHeader>
           <CardContent className="flex-1 min-h-0 pt-0">
             <ScrollArea className="h-[calc(100vh-180px)] md:h-[calc(100vh-200px)] lg:h-[calc(100vh-220px)]">
@@ -85,7 +153,7 @@ export default function LogsPage() {
                   >
                     {/* Timestamp */}
                     <span className="text-[10px] md:text-xs text-muted-foreground font-mono shrink-0">
-                      {log.timestamp}
+                      {formatTimestamp(log.timestamp)}
                     </span>
                     
                     {/* Level Badge */}
@@ -98,6 +166,9 @@ export default function LogsPage() {
                       </span>
                       {getLevelLabel(log.level)}
                     </Badge>
+
+                    {/* Source Badge */}
+                    {getSourceBadge(log.source)}
                     
                     {/* Message */}
                     <span className="text-xs md:text-sm text-foreground break-words">
@@ -105,11 +176,16 @@ export default function LogsPage() {
                     </span>
                   </div>
                 ))}
+                {!loading && logs.length === 0 && (
+                  <div className="text-center text-muted-foreground py-8">
+                    <FileText className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>{t("logs.noLogs") || "No logs available"}</p>
+                  </div>
+                )}
               </div>
             </ScrollArea>
           </CardContent>
         </Card>
-      </div>
     </div>
   );
 }

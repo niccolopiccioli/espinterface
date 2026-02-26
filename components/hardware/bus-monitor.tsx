@@ -18,9 +18,9 @@ export function BusMonitor({ data }: BusMonitorProps) {
   const { t } = useLanguage();
 
   return (
-    <Card className="bg-card border-border card-lift">
+    <Card className="bg-card border-border rounded-2xl shadow-lg">
       <CardHeader className="pb-4">
-        <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
+        <CardTitle className="text-lg lg:text-xl font-semibold text-foreground flex items-center gap-2">
           <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--hw-active)' }} />
           {t("bus.title")}
         </CardTitle>
@@ -28,16 +28,16 @@ export function BusMonitor({ data }: BusMonitorProps) {
       <CardContent>
         <Tabs defaultValue="uart" className="w-full">
           <TabsList className="grid w-full grid-cols-3" style={{ backgroundColor: 'var(--hw-surface-light)' }}>
-            <TabsTrigger value="uart" className="gap-2">
-              <Terminal className="h-3.5 w-3.5" />
+            <TabsTrigger value="uart" className="gap-2 text-xs lg:text-sm">
+              <Terminal className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
               {t("bus.uart")}
             </TabsTrigger>
-            <TabsTrigger value="i2c" className="gap-2">
-              <Usb className="h-3.5 w-3.5" />
+            <TabsTrigger value="i2c" className="gap-2 text-xs lg:text-sm">
+              <Usb className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
               {t("bus.i2c")}
             </TabsTrigger>
-            <TabsTrigger value="spi" className="gap-2">
-              <Cpu className="h-3.5 w-3.5" />
+            <TabsTrigger value="spi" className="gap-2 text-xs lg:text-sm">
+              <Cpu className="h-3.5 w-3.5 lg:h-4 lg:w-4" />
               {t("bus.spi")}
             </TabsTrigger>
           </TabsList>

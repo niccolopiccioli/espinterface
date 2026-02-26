@@ -3,24 +3,30 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutDashboard, FileText, Settings, Cpu, Menu, X } from "lucide-react";
+import { LayoutDashboard, Cpu, FileText, Settings, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useEffect } from "react";
+import { useLanguage } from "@/lib/i18n";
 
 const navItems = [
   {
     href: "/dashboard",
-    label: "Monitor & Control",
+    labelKey: "nav.dashboard",
     icon: LayoutDashboard,
   },
   {
+    href: "/devices",
+    labelKey: "nav.devices",
+    icon: Cpu,
+  },
+  {
     href: "/logs",
-    label: "Communication Logs",
+    labelKey: "nav.logs",
     icon: FileText,
   },
   {
     href: "/settings",
-    label: "Configuration",
+    labelKey: "nav.settings",
     icon: Settings,
   },
 ];
@@ -29,6 +35,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     setMounted(true);
@@ -116,7 +123,7 @@ export function Sidebar() {
                     />
                   )}
                   <Icon className="h-4 w-4 z-10 shrink-0" />
-                  <span className="z-10 truncate">{item.label}</span>
+                  <span className="z-10 truncate">{t(item.labelKey)}</span>
                 </Link>
               );
             })}

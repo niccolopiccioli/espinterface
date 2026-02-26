@@ -14,6 +14,7 @@ interface Translations {
 const translations: Translations = {
   // Navigation
   "nav.dashboard": { en: "Monitor & Control", it: "Monitor & Controllo" },
+  "nav.devices": { en: "Devices", it: "Dispositivi" },
   "nav.logs": { en: "Communication Logs", it: "Log Comunicazione" },
   "nav.settings": { en: "Configuration", it: "Configurazione" },
   
@@ -42,7 +43,7 @@ const translations: Translations = {
   "io.toggle": { en: "Toggle", it: "Cambia" },
   
   // Bus Monitor
-  "bus.title": { en: "Bus Monitor", it: "Monitor Bus" },
+  "bus.title": { en: "Monitor", it: "Monitor" },
   "bus.uart": { en: "UART", it: "UART" },
   "bus.i2c": { en: "I2C", it: "I2C" },
   "bus.spi": { en: "SPI", it: "SPI" },
@@ -85,12 +86,39 @@ const translations: Translations = {
   "settings.theme": { en: "Theme", it: "Tema" },
   "settings.themeDesc": { en: "Choose color theme", it: "Scegli il tema dei colori" },
   
+  // Devices
+  "devices.title": { en: "Devices Configuration", it: "Configurazione Dispositivi" },
+  "devices.editDevices": { en: "Edit devices", it: "Modifica dispositivi" },
+  "devices.gpio": { en: "GPIO", it: "GPIO" },
+  "devices.i2c": { en: "I2C Devices", it: "Dispositivi I2C" },
+  "devices.spi": { en: "SPI Devices", it: "Dispositivi SPI" },
+  "devices.add": { en: "Add Device", it: "Aggiungi Dispositivo" },
+  "devices.edit": { en: "Edit", it: "Modifica" },
+  "devices.delete": { en: "Delete", it: "Elimina" },
+  "devices.save": { en: "Save", it: "Salva" },
+  "devices.cancel": { en: "Cancel", it: "Annulla" },
+  "devices.pin": { en: "Pin", it: "Pin" },
+  "devices.label": { en: "Label", it: "Etichetta" },
+  "devices.mode": { en: "Mode", it: "Modo" },
+  "devices.address": { en: "Address", it: "Indirizzo" },
+  "devices.name": { en: "Name", it: "Nome" },
+  "devices.status": { en: "Status", it: "Stato" },
+  "devices.output": { en: "Output", it: "Uscita" },
+  "devices.input": { en: "Input", it: "Ingresso" },
+  "devices.connected": { en: "Connected", it: "Connesso" },
+  "devices.disconnected": { en: "Disconnected", it: "Disconnesso" },
+  "devices.speed": { en: "Speed (MHz)", it: "Velocità (MHz)" },
+  "devices.modeSpi": { en: "Mode", it: "Modo" },
+  "devices.noDevices": { en: "No devices configured", it: "Nessun dispositivo configurato" },
+  
   // Logs
   "logs.title": { en: "System Logs", it: "Log di Sistema" },
   "logs.info": { en: "INFO", it: "INFO" },
   "logs.warning": { en: "WARNING", it: "AVVISO" },
   "logs.error": { en: "ERROR", it: "ERRORE" },
   "logs.success": { en: "SUCCESS", it: "SUCCESSO" },
+  "logs.entries": { en: "entries", it: "voci" },
+  "logs.noLogs": { en: "No logs available", it: "Nessun log disponibile" },
   
   // Errors
   "error.title": { en: "Something went wrong!", it: "Qualcosa è andato storto!" },

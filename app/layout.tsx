@@ -2,7 +2,7 @@
 
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { Sidebar, MainContent } from "@/components/hardware/sidebar";
+import { Header } from "@/components/hardware/header";
 import { Providers } from "@/components/providers";
 
 const jetbrainsMono = JetBrains_Mono({
@@ -89,13 +89,13 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body
-        className={`${jetbrainsMono.variable} min-h-screen bg-background font-sans antialiased`}
+        className={`${jetbrainsMono.variable} min-h-screen bg-background font-sans antialiased pt-16`}
       >
         <Providers>
-          <Sidebar />
-          <MainContent>
+          <Header />
+          <main className="p-4 md:p-6 lg:p-8">
             {children}
-          </MainContent>
+          </main>
         </Providers>
       </body>
     </html>
