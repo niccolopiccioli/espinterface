@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { LayoutDashboard, Cpu, FileText, Settings, Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -33,6 +33,7 @@ const navItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { t } = useLanguage();
@@ -42,6 +43,22 @@ export function Sidebar() {
   }, []);
 
   const toggleSidebar = () => setIsOpen(!isOpen);
+
+  // Handle navigation with unsaved changes check
+  const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    // Check for unsaved changes in sessionStorage (set by devices page)
+    const hasUnsavedChanges = sessionStorage.getItem("hasUnsavedChanges") === "true";
+    
+    if (hasUnsavedChanges) {
+      e.preventDefault();
+      const confirmLeave = confirm("Hai modifiche non salvate. Vuoi uscire senza salvare?");
+      if (confirmLeave) {
+        sessionStorage.removeItem("hasUnsavedChanges");
+        router.push(href);
+      }
+    }
+    // Otherwise, normal navigation continues
+  };
 
   return (
     <>
@@ -99,7 +116,10 @@ export function Sidebar() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => {
+                    setIsOpen(false);
+                    handleNavigation(e, item.href);
+                  }}
                   className={cn(
                     "relative flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-medium transition-colors",
                     isActive

@@ -1,0 +1,80 @@
+{
+  "gpioOutputs": [
+    {
+      "pin": "04",
+      "mode": "output",
+      "state": false,
+      "label": "LED Built-in"
+    },
+    {
+      "pin": "12",
+      "mode": "output",
+      "state": false,
+      "label": "Relay 1"
+    },
+    {
+      "pin": "13",
+      "mode": "output",
+      "state": false,
+      "label": "Relay 2"
+    },
+    {
+      "pin": "14",
+      "mode": "output",
+      "state": false,
+      "label": "Buzzer"
+    }
+  ],
+  "gpioInputs": [
+    {
+      "pin": "15",
+      "mode": "input",
+      "state": false,
+      "label": "Button 0"
+    },
+    {
+      "pin": "16",
+      "mode": "input",
+      "state": false,
+      "label": "Button 1"
+    },
+    {
+      "pin": "17",
+      "mode": "input",
+      "state": false,
+      "label": "Sensor A"
+    },
+    {
+      "pin": "18",
+      "mode": "input",
+      "state": false,
+      "label": "Sensor B"
+    }
+  ],
+  "i2cDevices": [
+    {
+      "address": "3C",
+      "name": "OLED Display 0.96\"",
+      "status": "connected"
+    },
+    {
+      "address": "68",
+      "name": "MPU6050 IMU",
+      "status": "connected"
+    },
+    {
+      "address": "76",
+      "name": "BME280 Sensor",
+      "status": "connected"
+    }
+  ],
+  "spiDevices": [
+    {
+      "id": "spi-0",
+      "name": "SD Card Module",
+      "mode": "0",
+      "maxSpeed": 25,
+      "status": "connected"
+    }
+  ]
+}

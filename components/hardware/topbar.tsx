@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Wifi, WifiOff, RefreshCw } from "lucide-react";
+import Link from "next/link";
+import { Wifi, WifiOff, RefreshCw, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface TopbarProps {
@@ -12,18 +13,35 @@ interface TopbarProps {
 
 export function Topbar({ connected, deviceName, onPing }: TopbarProps) {
   return (
-    <header className="sticky top-0 z-30 h-14 md:h-16 border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60">
-      <div className="flex h-full items-center justify-between px-3 md:px-6">
-        {/* Page Title */}
-        <div className="ml-10 md:ml-0">
-          <h2 className="text-sm md:text-lg font-semibold text-foreground">Hardware Dashboard</h2>
-          <p className="text-xs text-muted-foreground font-mono hidden md:block">
+    <header className="sticky top-0 z-30 h-20 md:h-24 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 relative">
+      <div className="flex h-full items-center justify-between w-full px-4 md:px-8">
+        
+        {/* Settings Button - Left */}
+        <div className="flex-shrink-0">
+          <Link href="/settings">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 border-border hover:bg-secondary"
+            >
+              <Settings className="h-4 w-4" />
+              <span className="hidden md:inline">Settings</span>
+            </Button>
+          </Link>
+        </div>
+
+        {/* Center - Title and Device Name - FULL PAGE CENTERED */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center justify-center text-center">
+          <h2 className="text-lg md:text-xl font-semibold text-foreground">
+            Hardware Dashboard
+          </h2>
+          <p className="text-xs md:text-sm text-muted-foreground font-mono">
             {deviceName}
           </p>
         </div>
 
-        {/* Connection Status */}
-        <div className="flex items-center gap-2 md:gap-4">
+        {/* Right - Connection Status */}
+        <div className="flex items-center gap-2 md:gap-4 flex-shrink-0">
           <Button
             variant="outline"
             size="sm"

@@ -5,13 +5,50 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Separator } from "@/components/ui/separator";
+import { Topbar } from "@/components/hardware/topbar";
 import { useLanguage } from "@/lib/i18n";
 import { useTheme, Theme } from "@/lib/theme";
 import { Moon, Sun, Sparkles, Palette, Cpu, Globe, Home } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function SettingsPage() {
   const { t, language, setLanguage } = useLanguage();
   const { theme, setTheme } = useTheme();
+
+  // Custom Topbar for Settings with Home button
+  const SettingsTopbar = () => (
+    <header className="sticky top-0 z-30 h-20 md:h-24 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 relative">
+      <div className="flex h-full items-center justify-between w-full px-4 md:px-8">
+        
+        {/* Home Button - Left */}
+        <div className="flex-shrink-0">
+          <Link href="/dashboard">
+            <Button
+              variant="outline"
+              size="sm"
+              className="gap-2 border-border hover:bg-secondary"
+            >
+              <Home className="h-4 w-4" />
+              <span className="hidden md:inline">Home</span>
+            </Button>
+          </Link>
+        </div>
+
+        {/* Center - Title - FULL PAGE CENTERED */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center justify-center text-center">
+          <h2 className="text-lg md:text-xl font-semibold text-foreground">
+            Settings
+          </h2>
+          <p className="text-xs md:text-sm text-muted-foreground font-mono">
+            Configuration
+          </p>
+        </div>
+
+        {/* Right - Empty spacer */}
+        <div className="flex-shrink-0 w-24" />
+      </div>
+    </header>
+  );
 
   const themes: { value: Theme; label: string; icon: React.ReactNode }[] = [
     { value: "dark", label: "Dark", icon: <Moon className="h-4 w-4" /> },
@@ -21,8 +58,13 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="space-y-4 md:space-y-6">
-      {/* Hardware Configuration - FIRST */}
+    <div className="space-y-4 md:space-y-6 pb-8">
+      {/* Settings Topbar - FULL WIDTH */}
+      <SettingsTopbar />
+      
+      {/* Content with side margins */}
+      <div className="px-4 md:px-8">
+        {/* Hardware Configuration - FIRST */}
       <Card className="bg-card border-border">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -199,6 +241,7 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
     </div>
   );
 }

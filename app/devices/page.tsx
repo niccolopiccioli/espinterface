@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/lib/i18n";
 import { Cpu, Plus, Pencil, Trash2, Save, X, Wifi, Usb, Home } from "lucide-react";
 
-// Backend URL
+// Backend URL - configure here
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 // Types
@@ -77,21 +77,33 @@ export default function DevicesPage() {
   const [devices, setDevices] = useState<DevicesData | null>(null);
   const [connected, setConnected] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   // GPIO forms
   const [showGPIOForm, setShowGPIOForm] = useState(false);
   const [editingGPIO, setEditingGPIO] = useState<EditingGPIO>(null);
   const [gpioForm, setGpioForm] = useState<GPIOFormData>({ pin: "", mode: "output", label: "" });
-  
+
   // I2C forms
   const [showI2CForm, setShowI2CForm] = useState(false);
   const [editingI2C, setEditingI2C] = useState<EditingI2C>(null);
   const [i2cForm, setI2cForm] = useState<I2CFormData>({ address: "", name: "" });
-  
+
   // SPI forms
   const [showSPIForm, setShowSPIForm] = useState(false);
   const [editingSPI, setEditingSPI] = useState<EditingSPI>(null);
   const [spiForm, setSpiForm] = useState<SPIFormData>({ name: "", mode: "0", maxSpeed: 25 });
+
+  // Unsaved changes state
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // Save all pending changes
+  const handleSaveAll = async () => {
+    setSaving(true);
+    setHasUnsavedChanges(false);
+    await fetchDevices();
+    setSaving(false);
+  };
 
   const fetchDevices = useCallback(async () => {
     try {
@@ -202,21 +214,68 @@ export default function DevicesPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl md:text-2xl font-bold text-foreground">
-        {t("devices.title")}
-      </h1>
+    <div className="flex flex-col gap-4 pb-8">
+      {/* Topbar - FULL WIDTH */}
+      <header className="sticky top-0 z-30 h-20 md:h-24 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 relative">
+        <div className="flex h-full items-center justify-between w-full px-4 md:px-8">
 
+          {/* Left - Home Button */}
+          <div className="flex-shrink-0">
+            <Link href="/dashboard">
+              <Button variant="outline" size="sm" className="gap-2 border-border hover:bg-secondary">
+                <Home className="h-4 w-4" />
+                <span className="hidden md:inline">Home</span>
+              </Button>
+            </Link>
+          </div>
+
+          {/* Center - Title */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center justify-center text-center">
+            <h1 className="text-lg md:text-xl font-bold text-foreground">
+              Devices Configuration
+            </h1>
+            <p className="text-xs md:text-sm text-muted-foreground font-mono">
+              GPIO / I2C / SPI
+            </p>
+          </div>
+
+          {/* Right - Save Button */}
+          <div className="flex-shrink-0">
+            <Button
+              variant={hasUnsavedChanges ? "default" : "outline"}
+              size="sm"
+              onClick={handleSaveAll}
+              disabled={!hasUnsavedChanges || saving}
+              className={hasUnsavedChanges ? "bg-green-600 hover:bg-green-700" : ""}
+            >
+              {saving ? (
+                <span className="flex items-center gap-1">
+                  <span className="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full" />
+                  Salvataggio...
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <Save className="h-4 w-4" />
+                  Salva
+                </span>
+              )}
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Content with side margins */}
+      <div className="px-4 md:px-8">
         {/* GPIO Section */}
-        <Card className="bg-card border-border">
+        <Card className="bg-card border-border mb-4 md:mb-6">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <Cpu className="h-5 w-5" style={{ color: 'var(--hw-warning)' }} />
                 {t("devices.gpio")}
               </CardTitle>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => { setShowGPIOForm(true); setEditingGPIO(null); setGpioForm({ pin: "", mode: "output", label: "" }); }}
               >
@@ -232,18 +291,18 @@ export default function DevicesPage() {
                 <div className="grid grid-cols-3 gap-2">
                   <div>
                     <Label className="text-xs">{t("devices.pin")}</Label>
-                    <Input 
-                      value={gpioForm.pin} 
-                      onChange={(e) => setGpioForm({...gpioForm, pin: e.target.value})}
+                    <Input
+                      value={gpioForm.pin}
+                      onChange={(e) => setGpioForm({ ...gpioForm, pin: e.target.value })}
                       placeholder="04"
                       disabled={!!editingGPIO}
                     />
                   </div>
                   <div>
                     <Label className="text-xs">{t("devices.mode")}</Label>
-                    <Select 
-                      value={gpioForm.mode} 
-                      onValueChange={(v) => setGpioForm({...gpioForm, mode: v as "output" | "input"})}
+                    <Select
+                      value={gpioForm.mode}
+                      onValueChange={(v) => setGpioForm({ ...gpioForm, mode: v as "output" | "input" })}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -256,9 +315,9 @@ export default function DevicesPage() {
                   </div>
                   <div>
                     <Label className="text-xs">{t("devices.label")}</Label>
-                    <Input 
-                      value={gpioForm.label} 
-                      onChange={(e) => setGpioForm({...gpioForm, label: e.target.value})}
+                    <Input
+                      value={gpioForm.label}
+                      onChange={(e) => setGpioForm({ ...gpioForm, label: e.target.value })}
                       placeholder="LED"
                     />
                   </div>
@@ -325,15 +384,15 @@ export default function DevicesPage() {
         </Card>
 
         {/* I2C Section */}
-        <Card className="bg-card border-border">
+        <Card className="bg-card border-border mb-4 md:mb-6">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <Wifi className="h-5 w-5" style={{ color: 'var(--hw-success)' }} />
                 {t("devices.i2c")}
               </CardTitle>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => { setShowI2CForm(true); setEditingI2C(null); setI2cForm({ address: "", name: "" }); }}
               >
@@ -349,18 +408,18 @@ export default function DevicesPage() {
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <Label className="text-xs">{t("devices.address")} (hex)</Label>
-                    <Input 
-                      value={i2cForm.address} 
-                      onChange={(e) => setI2cForm({...i2cForm, address: e.target.value.toUpperCase()})}
+                    <Input
+                      value={i2cForm.address}
+                      onChange={(e) => setI2cForm({ ...i2cForm, address: e.target.value.toUpperCase() })}
                       placeholder="3C"
                       disabled={!!editingI2C}
                     />
                   </div>
                   <div>
                     <Label className="text-xs">{t("devices.name")}</Label>
-                    <Input 
-                      value={i2cForm.name} 
-                      onChange={(e) => setI2cForm({...i2cForm, name: e.target.value})}
+                    <Input
+                      value={i2cForm.name}
+                      onChange={(e) => setI2cForm({ ...i2cForm, name: e.target.value })}
                       placeholder="OLED Display"
                     />
                   </div>
@@ -403,15 +462,15 @@ export default function DevicesPage() {
         </Card>
 
         {/* SPI Section */}
-        <Card className="bg-card border-border">
+        <Card className="bg-card border-border mb-4 md:mb-6">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
                 <Usb className="h-5 w-5" style={{ color: '#3B82F6' }} />
                 {t("devices.spi")}
               </CardTitle>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 onClick={() => { setShowSPIForm(true); setEditingSPI(null); setSpiForm({ name: "", mode: "0", maxSpeed: 25 }); }}
               >
@@ -427,17 +486,17 @@ export default function DevicesPage() {
                 <div className="grid grid-cols-3 gap-2">
                   <div>
                     <Label className="text-xs">{t("devices.name")}</Label>
-                    <Input 
-                      value={spiForm.name} 
-                      onChange={(e) => setSpiForm({...spiForm, name: e.target.value})}
+                    <Input
+                      value={spiForm.name}
+                      onChange={(e) => setSpiForm({ ...spiForm, name: e.target.value })}
                       placeholder="SD Card"
                     />
                   </div>
                   <div>
                     <Label className="text-xs">{t("devices.modeSpi")}</Label>
-                    <Select 
-                      value={spiForm.mode} 
-                      onValueChange={(v) => setSpiForm({...spiForm, mode: v})}
+                    <Select
+                      value={spiForm.mode}
+                      onValueChange={(v) => setSpiForm({ ...spiForm, mode: v })}
                     >
                       <SelectTrigger>
                         <SelectValue />
@@ -452,10 +511,10 @@ export default function DevicesPage() {
                   </div>
                   <div>
                     <Label className="text-xs">{t("devices.speed")}</Label>
-                    <Input 
+                    <Input
                       type="number"
-                      value={spiForm.maxSpeed} 
-                      onChange={(e) => setSpiForm({...spiForm, maxSpeed: parseInt(e.target.value) || 25})}
+                      value={spiForm.maxSpeed}
+                      onChange={(e) => setSpiForm({ ...spiForm, maxSpeed: parseInt(e.target.value) || 25 })}
                       placeholder="25"
                     />
                   </div>
@@ -496,6 +555,7 @@ export default function DevicesPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
     </div>
   );
 }

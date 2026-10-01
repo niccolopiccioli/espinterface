@@ -125,7 +125,7 @@ export default function LogsPage() {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col px-4 md:px-8 pb-8">
       <Card className="bg-card border-border h-full flex flex-col">
         <CardHeader className="pb-3 md:pb-4 shrink-0 flex flex-row items-center justify-between">
           <CardTitle className="text-lg md:text-xl font-semibold text-foreground flex items-center gap-2">
