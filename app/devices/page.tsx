@@ -10,9 +10,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/lib/i18n";
 import { Cpu, Plus, Pencil, Trash2, Save, X, Wifi, Usb, Home } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/api-config";
 
-// Backend URL
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+// Get API base URL based on access method (localhost = simulation, IP = hardware)
+const API_BASE = getApiBaseUrl();
 
 // Types
 interface GPIOState {
@@ -92,6 +93,18 @@ export default function DevicesPage() {
   const [showSPIForm, setShowSPIForm] = useState(false);
   const [editingSPI, setEditingSPI] = useState<EditingSPI>(null);
   const [spiForm, setSpiForm] = useState<SPIFormData>({ name: "", mode: "0", maxSpeed: 25 });
+
+  // Unsaved changes state
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // Save all pending changes
+  const handleSaveAll = async () => {
+    setSaving(true);
+    setHasUnsavedChanges(false);
+    await fetchDevices();
+    setSaving(false);
+  };
 
   const fetchDevices = useCallback(async () => {
     try {
@@ -202,13 +215,60 @@ export default function DevicesPage() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <h1 className="text-xl md:text-2xl font-bold text-foreground">
-        {t("devices.title")}
-      </h1>
+    <div className="flex flex-col gap-4 pb-8">
+      {/* Topbar - FULL WIDTH */}
+      <header className="sticky top-0 z-30 h-20 md:h-24 w-full border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/60 relative">
+        <div className="flex h-full items-center justify-between w-full px-4 md:px-8">
+          
+          {/* Left - Home Button */}
+          <div className="flex-shrink-0">
+            <Link href="/dashboard">
+              <Button variant="outline" size="sm" className="gap-2 border-border hover:bg-secondary">
+                <Home className="h-4 w-4" />
+                <span className="hidden md:inline">Home</span>
+              </Button>
+            </Link>
+          </div>
 
+          {/* Center - Title */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 flex flex-col items-center justify-center text-center">
+            <h1 className="text-lg md:text-xl font-bold text-foreground">
+              Devices Configuration
+            </h1>
+            <p className="text-xs md:text-sm text-muted-foreground font-mono">
+              GPIO / I2C / SPI
+            </p>
+          </div>
+
+          {/* Right - Save Button */}
+          <div className="flex-shrink-0">
+            <Button
+              variant={hasUnsavedChanges ? "default" : "outline"}
+              size="sm"
+              onClick={handleSaveAll}
+              disabled={!hasUnsavedChanges || saving}
+              className={hasUnsavedChanges ? "bg-green-600 hover:bg-green-700" : ""}
+            >
+              {saving ? (
+                <span className="flex items-center gap-1">
+                  <span className="animate-spin h-3 w-3 border-2 border-white border-t-transparent rounded-full" />
+                  Salvataggio...
+                </span>
+              ) : (
+                <span className="flex items-center gap-1">
+                  <Save className="h-4 w-4" />
+                  Salva
+                </span>
+              )}
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* Content with side margins */}
+      <div className="px-4 md:px-8">
         {/* GPIO Section */}
-        <Card className="bg-card border-border">
+        <Card className="bg-card border-border mb-4 md:mb-6">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -325,7 +385,7 @@ export default function DevicesPage() {
         </Card>
 
         {/* I2C Section */}
-        <Card className="bg-card border-border">
+        <Card className="bg-card border-border mb-4 md:mb-6">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -403,7 +463,7 @@ export default function DevicesPage() {
         </Card>
 
         {/* SPI Section */}
-        <Card className="bg-card border-border">
+        <Card className="bg-card border-border mb-4 md:mb-6">
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-lg font-semibold text-foreground flex items-center gap-2">
@@ -496,6 +556,7 @@ export default function DevicesPage() {
             </div>
           </CardContent>
         </Card>
+      </div>
     </div>
   );
 }

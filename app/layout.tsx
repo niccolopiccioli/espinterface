@@ -1,9 +1,8 @@
-"use client";
-
+import type { Metadata } from "next";
 import { JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { Header } from "@/components/hardware/header";
 import { Providers } from "@/components/providers";
+import { Header } from "@/components/hardware/header";
 
 const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
@@ -76,6 +75,11 @@ const themeScript = `
 })();
 `;
 
+export const metadata: Metadata = {
+  title: "ESP-Control Interface",
+  description: "Hardware monitoring dashboard for ESP32",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -84,18 +88,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <title>ESP-Control Interface</title>
-        <meta name="description" content="Hardware monitoring dashboard for ESP32" />
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body
-        className={`${jetbrainsMono.variable} min-h-screen bg-background font-sans antialiased pt-16`}
+        className={`${jetbrainsMono.variable} min-h-screen bg-background font-sans antialiased`}
       >
         <Providers>
-          <Header />
-          <main className="p-4 md:p-6 lg:p-8">
-            {children}
-          </main>
+          {children}
         </Providers>
       </body>
     </html>

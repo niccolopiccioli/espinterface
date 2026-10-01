@@ -5,13 +5,16 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { DigitalIOPanel } from "@/components/hardware/digital-io-panel";
 import { BusMonitor } from "@/components/hardware/bus-monitor";
+import { Topbar } from "@/components/hardware/topbar";
 import { Separator } from "@/components/ui/separator";
 import type { HardwareAPIMessage } from "@/lib/types";
 import { Activity, Clock, Zap, Cpu, Settings } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
+import { getApiBaseUrl, getConnectionMode } from "@/lib/api-config";
 
-// Backend URL - configure here
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+// Get API base URL based on access method (localhost = simulation, IP = hardware)
+const API_BASE = getApiBaseUrl();
+const CONNECTION_MODE = getConnectionMode();
 
 export default function DashboardPage() {
   const [hardwareData, setHardwareData] = useState<HardwareAPIMessage["data"] | null>(null);
@@ -64,11 +67,20 @@ export default function DashboardPage() {
   const busMonitor = hardwareData?.busMonitor;
 
   return (
-    <div className="flex flex-col gap-3 md:gap-4 lg:gap-6">
+    <div className="flex flex-col gap-3 md:gap-4 lg:gap-6 pb-8">
       
-      {/* Status Cards - responsive: 2x2 su mobile, 4 in riga su desktop */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 lg:gap-6">
-        <StatusCard
+      {/* Topbar with connection status and ping - FULL WIDTH */}
+      <Topbar 
+        connected={connected} 
+        deviceName={hardware?.deviceName || "ESP32"} 
+        onPing={fetchHardwareStatus}
+      />
+      
+      {/* Content with side margins */}
+      <div className="px-4 md:px-8">
+        {/* Status Cards - responsive: 2x2 su mobile, 4 in riga su desktop */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 lg:gap-6 mb-4 md:mb-6">
+          <StatusCard
             icon={Cpu}
             label={t("status.device")}
             value={hardware?.deviceName?.replace("ESP32-WROOM-32", "ESP32") || (loading ? "..." : "N/A")}
@@ -132,6 +144,7 @@ export default function DashboardPage() {
             )}
           </div>
         </div>
+      </div>
     </div>
   );
 }

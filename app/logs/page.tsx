@@ -7,9 +7,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { useLanguage } from "@/lib/i18n";
 import { FileText, AlertCircle, AlertTriangle, CheckCircle, Info, Loader2, Home } from "lucide-react";
+import { getApiBaseUrl } from "@/lib/api-config";
 
-// Backend URL - configure here
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+// Get API base URL based on access method (localhost = simulation, IP = hardware)
+const API_BASE = getApiBaseUrl();
 
 // Log level types
 type LogLevel = "info" | "success" | "warning" | "error";
@@ -125,7 +126,7 @@ export default function LogsPage() {
   };
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col px-4 md:px-8 pb-8">
       <Card className="bg-card border-border h-full flex flex-col">
         <CardHeader className="pb-3 md:pb-4 shrink-0 flex flex-row items-center justify-between">
           <CardTitle className="text-lg md:text-xl font-semibold text-foreground flex items-center gap-2">

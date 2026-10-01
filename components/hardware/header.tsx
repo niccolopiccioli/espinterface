@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Cpu, Settings, Home } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Cpu, Settings, Home, LogOut, User } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
-import { usePathname } from "next/navigation";
+import { signOut, useSession } from "next-auth/react";
 
 interface HeaderProps {
   deviceName?: string;
@@ -12,13 +13,27 @@ interface HeaderProps {
 export function Header({ deviceName = "ESP32" }: HeaderProps) {
   const { t } = useLanguage();
   const pathname = usePathname();
-  
+  const router = useRouter();
+  const { data: session, status } = useSession();
+
+  const handleLogout = async () => {
+    await signOut({ redirect: true, callbackUrl: "/login" });
+  };
+
+  // Don't show header on login page
+  if (pathname === "/login") {
+    return null;
+  }
+
+  const isAuthenticated = status === "authenticated";
+  const userName = session?.user?.name || session?.user?.email || "User";
+
   return (
     <>
       <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-card/95 backdrop-blur border-b border-border">
         <div className="h-full px-4 flex items-center justify-between">
           
-          {/* Home o Settings a sinistra, in base alla pagina */}
+          {/* Home/Settings e Logout a sinistra */}
           <div className="flex items-center gap-2">
             {pathname === "/dashboard" ? (
               <Link href="/settings">
@@ -57,16 +72,47 @@ export function Header({ deviceName = "ESP32" }: HeaderProps) {
                 </div>
               </Link>
             )}
+
+            {/* Logout button */}
+            {isAuthenticated && (
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-3 py-1.5 cursor-pointer"
+                style={{ 
+                  backgroundColor: 'var(--hw-danger-dim)',
+                  border: '1px solid var(--hw-danger)',
+                  borderRadius: '0.75rem',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  height: '2rem',
+                }}
+                title="Sign out"
+              >
+                <LogOut className="h-4 w-4 lg:h-5 lg:w-5" style={{ color: 'var(--hw-danger)' }} />
+                <span className="text-[10px] md:text-xs lg:text-sm" style={{ color: 'var(--hw-danger)' }}>
+                  Logout
+                </span>
+              </button>
+            )}
           </div>
 
-          {/* Hardware Dashboard - a destra su mobile, al centro su desktop */}
+          {/* Hardware Dashboard - al centro */}
           <div className="absolute right-4 md:static md:absolute md:left-1/2 md:-translate-x-1/2 md:text-center flex flex-col items-end md:items-center">
             <h2 className="text-base md:text-lg lg:text-xl font-semibold text-foreground">Hardware Dashboard</h2>
             <p className="text-[10px] md:text-xs lg:text-sm text-muted-foreground hidden md:block">{deviceName}</p>
           </div>
 
-          {/* Logo a destra - nascosto su mobile */}
+          {/* Logo e User info a destra */}
           <div className="hidden md:flex items-center gap-3">
+            {isAuthenticated && (
+              <div className="flex items-center gap-2 px-3 py-1.5" style={{ 
+                backgroundColor: 'var(--hw-surface-light)',
+                border: '1px solid var(--border)',
+                borderRadius: '0.75rem',
+              }}>
+                <User className="h-4 w-4" style={{ color: 'var(--hw-success)' }} />
+                <span className="text-xs text-foreground">{userName}</span>
+              </div>
+            )}
             <div>
               <h1 className="text-sm lg:text-base font-bold text-foreground">ESP-Control</h1>
               <p className="text-[10px] lg:text-xs text-muted-foreground">Interface v1.0</p>
